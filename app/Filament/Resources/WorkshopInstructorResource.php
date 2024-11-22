@@ -22,6 +22,7 @@ class WorkshopInstructorResource extends Resource
     protected static ?string $model = WorkshopInstructor::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Workshop Management';
 
     public static function form(Form $form): Form
     {
@@ -37,6 +38,8 @@ class WorkshopInstructorResource extends Resource
 
                 FileUpload::make('avatar')
                 ->image()
+                ->disk('public')
+                ->directory('workshopInstructorAvatar')
                 ->required(),
             ]);
     }
@@ -48,14 +51,15 @@ class WorkshopInstructorResource extends Resource
                 TextColumn::make('name')
                 ->searchable(),
                 TextColumn::make('occupation'),
-                ImageColumn::make('avatar'),
+                ImageColumn::make('avatar')
+                ->circular(),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

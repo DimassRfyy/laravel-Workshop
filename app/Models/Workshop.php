@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class Workshop extends Model
 {
@@ -15,7 +16,7 @@ class Workshop extends Model
 
     protected $fillable = [
         'name',
-        'slug',
+        'description',
         'thumbnail',
         'venue_thumbnail',
         'bg_map',
@@ -34,6 +35,35 @@ class Workshop extends Model
         'started_at' => 'date',
         'time_at' => 'datetime:H:i',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($workshop) {
+            if ($workshop->thumbnail) {
+                Storage::delete($workshop->thumbnail);
+            }
+            if ($workshop->venue_thumbnail) {
+                Storage::delete($workshop->venue_thumbnail);
+            }
+            if ($workshop->bg_map) {
+                Storage::delete($workshop->bg_map);
+            }
+        });
+
+        static::updating(function ($workshop) {
+            if ($workshop->isDirty('thumbnail')) {
+                Storage::delete($workshop->getOriginal('thumbnail'));
+            }
+            if ($workshop->isDirty('venue_thumbnail')) {
+                Storage::delete($workshop->getOriginal('venue_thumbnail'));
+            }
+            if ($workshop->isDirty('bg_map')) {
+                Storage::delete($workshop->getOriginal('bg_map'));
+            }
+        });
+    }
 
     public function setNameAttribute($value) {
         $this->attributes['name'] = $value;

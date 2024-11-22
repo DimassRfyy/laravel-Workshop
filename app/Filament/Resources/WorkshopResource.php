@@ -16,7 +16,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Support\Enums\ActionSize;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -30,6 +32,7 @@ class WorkshopResource extends Resource
     protected static ?string $model = Workshop::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Workshop Management';
 
     public static function form(Form $form): Form
     {
@@ -50,16 +53,22 @@ class WorkshopResource extends Resource
                     FileUpload::make('thumbnail')
                     ->maxSize(5120)
                     ->image()
+                    ->disk('public')
+                    ->directory('workshopThumbnail')
                     ->required(),
 
                     FileUpload::make('venue_thumbnail')
                     ->maxSize(5120)
                     ->image()
+                    ->disk('public')
+                    ->directory('workshopVenueThumbnail')
                     ->required(),
 
                     FileUpload::make('bg_map')
                     ->maxSize(5120)
                     ->image()
+                    ->disk('public')
+                    ->directory('workshopBgMap')
                     ->required(),
 
                     Repeater::make('benefits')
@@ -148,7 +157,19 @@ class WorkshopResource extends Resource
                 ->relationship('instructor', 'name'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                    ActionGroup::make([
+                        Tables\Actions\ViewAction::make(),
+                        Tables\Actions\EditAction::make(),
+                    ])
+                        ->dropdown(false),
+                    Tables\Actions\DeleteAction::make(),
+                ])
+                ->label('Actions')
+                ->size(ActionSize::Small)
+                ->color('primary')
+                ->button()
+                ->icon('heroicon-m-bars-3')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

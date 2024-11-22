@@ -21,7 +21,9 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-list-bullet';
+
+    protected static ?string $navigationGroup = 'Workshop Management';
 
     public static function form(Form $form): Form
     {
@@ -37,6 +39,8 @@ class CategoryResource extends Resource
 
                 FileUpload::make('icon')
                 ->image()
+                ->disk('public')
+                ->directory('categoriesIcon')
                 ->required()
             ]);
     }
@@ -47,15 +51,14 @@ class CategoryResource extends Resource
             ->columns([
                 TextColumn::make('name')
                 ->searchable(),
-
                 ImageColumn::make('icon')
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
